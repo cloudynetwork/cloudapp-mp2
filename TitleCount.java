@@ -102,7 +102,17 @@ public class TitleCount extends Configured implements Tool {
     public static class TitleCountReduce extends Reducer<Text, IntWritable, Text, IntWritable> {
         @Override
         public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
-            // TODO
+        	
+        	Integer countValue = 0;
+        	for (IntWritable intWrite : values) {
+        		
+        		countValue += intWrite.get();
+        		
+        	}
+
+        	IntWritable outputTotal = new IntWritable(countValue);
+        	context.write(key, outputTotal);
+        	
         }
     }
 }
