@@ -139,7 +139,7 @@ public class TopTitles extends Configured implements Tool {
      
         }
     }
-
+    }
     public static class TitleCountReduce extends Reducer<Text, IntWritable, Text, IntWritable> {
         @Override
         public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
@@ -235,7 +235,6 @@ public class TopTitles extends Configured implements Tool {
         }
     }
 
-}
 
 // >>> Don't Change
 class Pair<A extends Comparable<? super A>,
