@@ -178,19 +178,29 @@ public class TopTitles extends Configured implements Tool {
             
             if (countTitleSet.size() > N) {
             	countTitleSet.remove(countTitleSet.first());
+           
             }
             
         }
 
         @Override
         protected void cleanup(Context context) throws IOException, InterruptedException {
-            // TODO
+            
+        	for (Pair<Integer, String> thing : countTitleSet) {
+            	String[] outString = {thing.second, thing.first.toString()};
+             	TextArrayWritable outVal = new TextArrayWritable(outString);
+             	
+             	context.write(NullWritable.get(), outVal);
+             	
+            }
         }
     }
 
     public static class TopTitlesReduce extends Reducer<NullWritable, TextArrayWritable, Text, IntWritable> {
         Integer N;
-        // TODO
+         private TreeSet<Pair<Integer, String>> countTitleSet = new TreeSet<Pair<Integer, String>>();
+         
+         
 
         @Override
         protected void setup(Context context) throws IOException,InterruptedException {
@@ -200,7 +210,28 @@ public class TopTitles extends Configured implements Tool {
 
         @Override
         public void reduce(NullWritable key, Iterable<TextArrayWritable> values, Context context) throws IOException, InterruptedException {
-            // TODO
+            for (TextArrayWritable val : values) {
+            	Text[] pair = (Text []) val.toArray();
+            	String title = pair[0].toString();
+            	
+            	Integer count = Integer.parseInt(pair[1].toString());
+            	
+            	Pair<Integer, String> pairObj = new Pair<Integer, String>(count, title);            	
+            	countTitleSet.add(pairObj);
+            	
+            	if(countTitleSet.size() > N) {
+            		countTitleSet.remove(countTitleSet.first());
+            	}
+            	
+            	}
+            
+            for (Pair<Integer, String> thing: countTitleSet) {
+            	Text word = new Text(thing.second);
+            	IntWritable val = new IntWritable(thing.first);
+            	context.write(word, val);
+            	
+            }
+            }
         }
     }
 
