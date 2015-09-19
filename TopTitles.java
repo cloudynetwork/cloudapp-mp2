@@ -1,5 +1,11 @@
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.TreeSet;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -18,14 +24,6 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.List;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
 
 // >>> Don't Change
 public class TopTitles extends Configured implements Tool {
@@ -126,21 +124,42 @@ public class TopTitles extends Configured implements Tool {
 
         @Override
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-        // TODO
+         String linein = value.toString();
+
+         StringTokenizer tokenizer = new StringTokenizer(linein, delimiters);
+         
+         while (tokenizer.hasMoreTokens()) {
+         	String token = tokenizer.nextToken().trim().toLowerCase();
+         	
+         	if (!stopWords.contains(token)) {
+         		Text tokenToText = new Text(token);
+         		IntWritable outputInt = new IntWritable(1);
+         		context.write(tokenToText, outputInt);
+         	}
+     
         }
     }
 
     public static class TitleCountReduce extends Reducer<Text, IntWritable, Text, IntWritable> {
         @Override
         public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
-            // TODO
+        	
+        	Integer countValue = 0;
+        	for (IntWritable intWrite : values) {
+        		
+        		countValue += intWrite.get();
+        		
+        	}
+
+        	IntWritable outputTotal = new IntWritable(countValue);
+        	context.write(key, outputTotal);
         }
     }
 
     public static class TopTitlesMap extends Mapper<Text, Text, NullWritable, TextArrayWritable> {
         Integer N;
-        // TODO
-
+        	private TreeSet<Pair<Integer, String>> countTitleSet = new TreeSet<Pair<Integer, String>>();
+        
         @Override
         protected void setup(Context context) throws IOException,InterruptedException {
             Configuration conf = context.getConfiguration();
@@ -149,7 +168,18 @@ public class TopTitles extends Configured implements Tool {
 
         @Override
         public void map(Text key, Text value, Context context) throws IOException, InterruptedException {
-            // TODO
+            
+        	Integer count = Integer.parseInt(value.toString());
+            String title = key.toString();
+            
+            Pair<Integer,String> pairObj = new Pair<Integer,String>(count,title);
+            
+            countTitleSet.add(pairObj);
+            
+            if (countTitleSet.size() > N) {
+            	countTitleSet.remove(countTitleSet.first());
+            }
+            
         }
 
         @Override
