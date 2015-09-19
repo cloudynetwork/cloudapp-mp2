@@ -81,3 +81,7 @@ target/
 /TopTitles$TopTitlesMap.class
 /TopTitles$TopTitlesReduce.class
 /TopTitles.class
+/TopTitles$Pair.class
+/TopTitles$TitleCountMap$TitleCountReduce.class
+/TopTitles$TitleCountMap$TopTitlesMap.class
+/TopTitles$TitleCountMap$TopTitlesReduce.class

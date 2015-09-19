@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path=""/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="E:/hadoop/hadoop-2.7.1/share/hadoop/hdfs/lib/asm-3.2.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre7"/>
+	<classpathentry kind="lib" path="E:/hadoop/hadoop-2.7.1/share/hadoop/hdfs/lib/asm-3.2.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/E:/hadoop/hadoop-2.7.1/share/doc/hadoop/api/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="E:/hadoop/hadoop-2.7.1/share/hadoop/hdfs/lib/commons-cli-1.2.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="file:/E:/hadoop/hadoop-2.7.1/share/doc/hadoop/api/"/>
@@ -120,7 +124,11 @@
 	<classpathentry kind="lib" path="E:/hadoop/hadoop-2.7.1/share/hadoop/tools/lib/xmlenc-0.52.jar"/>
 	<classpathentry kind="lib" path="E:/hadoop/hadoop-2.7.1/share/hadoop/tools/lib/xz-1.0.jar"/>
 	<classpathentry kind="lib" path="E:/hadoop/hadoop-2.7.1/share/hadoop/tools/lib/zookeeper-3.4.6.jar"/>
-	<classpathentry kind="lib" path="E:/hadoop/hadoop-2.7.1/share/hadoop/common/hadoop-common-2.7.1.jar"/>
+	<classpathentry kind="lib" path="E:/hadoop/hadoop-2.7.1/share/hadoop/common/hadoop-common-2.7.1.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/E:/hadoop/hadoop-2.7.1/share/doc/hadoop/api/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="E:/hadoop/hadoop-2.7.1/share/hadoop/common/hadoop-common-2.7.1-tests.jar"/>
 	<classpathentry kind="lib" path="E:/hadoop/hadoop-2.7.1/share/hadoop/common/hadoop-nfs-2.7.1.jar"/>
 	<classpathentry kind="output" path=""/>
