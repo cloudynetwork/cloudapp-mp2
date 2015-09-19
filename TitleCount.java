@@ -1,5 +1,10 @@
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.List;
+import java.util.StringTokenizer;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -14,13 +19,6 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.List;
-import java.util.StringTokenizer;
 
 // >>> Don't Change
 public class TitleCount extends Configured implements Tool {
@@ -84,7 +82,20 @@ public class TitleCount extends Configured implements Tool {
 
         @Override
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-            // TODO
+            String stringValue = value.toString();
+            StringTokenizer tokenizer = new StringTokenizer(stringValue, delimiters);
+            
+            while (tokenizer.hasMoreTokens()) {
+            	String token = tokenizer.nextToken().trim().toLowerCase();
+            	
+            	if (!stopWords.contains(token)) {
+            		Text tokenToText = new Text(token);
+            		IntWritable outputInt = new IntWritable(1);
+            		context.write(tokenToText, outputInt);
+            	}
+            	
+            }
+            
         }
     }
 
