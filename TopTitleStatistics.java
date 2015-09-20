@@ -1,4 +1,4 @@
-package test;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -129,14 +129,35 @@ public class TopTitleStatistics extends Configured implements Tool {
 
         @Override
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-            // TODO
+        	   String linein = value.toString();
+
+               StringTokenizer tokenizer = new StringTokenizer(linein, delimiters);
+               
+               while (tokenizer.hasMoreTokens()) {
+               	String token = tokenizer.nextToken().trim().toLowerCase();
+               	
+               	if (!stopWords.contains(token)) {
+               		Text tokenToText = new Text(token);
+               		IntWritable outputInt = new IntWritable(1);
+               		context.write(tokenToText, outputInt);
+               	}
+           
+              }
         }
     }
 
     public static class TitleCountReduce extends Reducer<Text, IntWritable, Text, IntWritable> {
         @Override
         public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
-            // TODO
+        	Integer countValue = 0;
+        	for (IntWritable intWrite : values) {
+        		
+        		countValue += intWrite.get();
+        		
+        	}
+
+        	IntWritable outputTotal = new IntWritable(countValue);
+        	context.write(key, outputTotal);
         }
     }
 
