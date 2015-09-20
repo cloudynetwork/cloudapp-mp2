@@ -19,9 +19,6 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-
-import Pair;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -163,7 +160,7 @@ public class TopTitleStatistics extends Configured implements Tool {
 
     public static class TopTitlesStatMap extends Mapper<Text, Text, NullWritable, TextArrayWritable> {
         Integer N;
-        // TODO
+        private TreeSet<Pair<Integer, String>> countTitleSet = new TreeSet<Pair<Integer, String>>();
 
         @Override
         protected void setup(Context context) throws IOException,InterruptedException {
@@ -173,18 +170,34 @@ public class TopTitleStatistics extends Configured implements Tool {
 
         @Override
         public void map(Text key, Text value, Context context) throws IOException, InterruptedException {
-            // TODO
+          	Integer count = Integer.parseInt(value.toString());
+            String title = key.toString();
+            
+            Pair<Integer,String> pairObj = new Pair<Integer,String>(count,title);
+            
+            countTitleSet.add(pairObj);
+            
+            if (countTitleSet.size() > N) {
+            	countTitleSet.remove(countTitleSet.first());
+           
+            }
         }
 
         @Override
         protected void cleanup(Context context) throws IOException, InterruptedException {
-            // TODO
+        	for (Pair<Integer, String> thing : countTitleSet) {
+            	String[] outString = {thing.second, thing.first.toString()};
+             	TextArrayWritable outVal = new TextArrayWritable(outString);
+             	
+             	context.write(NullWritable.get(), outVal);
+             	
+            }
         }
     }
 
     public static class TopTitlesStatReduce extends Reducer<NullWritable, TextArrayWritable, Text, IntWritable> {
         Integer N;
-        // TODO
+        private TreeSet<Pair<Integer, String>> countTitleSet = new TreeSet<Pair<Integer, String>>();
 
         @Override
         protected void setup(Context context) throws IOException,InterruptedException {
@@ -196,8 +209,47 @@ public class TopTitleStatistics extends Configured implements Tool {
         public void reduce(NullWritable key, Iterable<TextArrayWritable> values, Context context) throws IOException, InterruptedException {
             Integer sum, mean, max, min, var;
 
-            // TODO
+            for (TextArrayWritable inVal : values ) {
+            	
+            	Text[] pair = (Text[]) inVal.toArray();
+            	
+            	String word = pair[0].toString();
+            	
+            	Integer count = Integer.parseInt(pair[1].toString());
+            	
+            	Pair<Integer, String> pairObj = new Pair<Integer, String>(count,word);
+            	
+            	countTitleSet.add(pairObj);
+            	
+            	if (countTitleSet.size() > N) {
+            		countTitleSet.remove(countTitleSet.first());
+            	}
+            	
+            }
 
+            sum = mean = max = min = var = 0;
+            
+            //Iterate through adding each to the the sum 
+            for(Pair<Integer, String> thing: countTitleSet) {
+            	
+            	sum += thing.first;
+            }
+            
+            //Get the last (highest) and take it's value
+            max = countTitleSet.last().first;
+            
+            // Get the first (lowest) element and take its value
+            min = countTitleSet.first().first;
+            
+            mean = sum/N;
+            
+            for (Pair<Integer, String> thing : countTitleSet) {
+            	Integer count = thing.first;
+            	var += (mean - count) * (mean - count); //Difference squared. 
+            }
+            
+            var = var/N; //Mean of the differences squared gives us the Variance. 
+            
             context.write(new Text("Mean"), new IntWritable(mean));
             context.write(new Text("Sum"), new IntWritable(sum));
             context.write(new Text("Min"), new IntWritable(min));
